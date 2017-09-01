@@ -8,10 +8,17 @@ class ObjectDetector(object):
         self.graph = tf.Graph()
         with self.graph.as_default():
             od_graph_def = tf.GraphDef()
-            with tf.gfile.Gfile(graph_path, 'rb') as fid:
+            with tf.gfile.GFile(graph_path, 'rb') as fid:
                 serialized_graph = fid.read()
                 od_graph_def.ParseFromString(serialized_graph)
                 tf.import_graph_def(od_graph_def, name='')
+
+            # Get graph variables
+            self.image_tensor = self.graph.get_tensor_by_name('image_tensor:0')
+            self.boxes = self.graph.get_tensor_by_name('detection_boxes:0')
+            self.scores = self.graph.get_tensor_by_name('detection_scores:0')
+            self.classes = self.graph.get_tensor_by_name('detection_classes:0')
+            self.num_detections = self.graph.get_tensor_by_name('num_detections:0')
 
         # Create session
         self.sess = tf.Session()
@@ -25,14 +32,9 @@ class ObjectDetector(object):
     def detect(image, max_objects=3):
         with self.graph.as_default():
             image_expanded = np.expand_dims(image, axis=0)
-            image_tensor = self.graph.get_tensor_by_name('image_tensor:0')
-            boxes = self.graph.get_tensor_by_name('detection_boxes:0')
-            scores = self.graph.get_tensor_by_name('detection_scores:0')
-            classes = self.graph.get_tensor_by_name('detection_classes:0')
-            num_detections = self.graph.get_tensor_by_name('num_detections:0')
 
             (boxes, scores, classes, num_detections) = self.sess.run(
-                    [boxes, scores, classes, num_detections],
+                    [self.boxes, self.scores, self.classes, self.num_detections],
                     feed_dict={image_tensor: image_expanded})
 
         print('Classes: {}'.format(classes))
