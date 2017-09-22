@@ -6,17 +6,20 @@ from recognition import ObjectDetector
 import cv2
 import numpy as np
 import tensorflow as tf
+import os
 
+GRAPH = os.path.join('graphs', 'fronze_inference_graqph.pb')
+LABELS = os.path.join('graphs', 'mscoco_label_map.pbtx')
 
 class RosTensorflow():
-    def __init__(self):
+    def __init__(self, gpath, lmpath):
         self._cv_bridge = CvBridge()
         self._sub = rospy.Subscriber('camera', Image, self.callback, queue_size=1)
         self._pub = rospy.Publisher('detection_result', String, queue_size=1)
 
         self.detector = ObjectDetector(
-                graph_path='',
-                label_map_path='',
+                graph_path=gpath,
+                label_map_path=lmpath,
                 num_classes='')
 
     def callback(self, image_msg):
@@ -32,5 +35,5 @@ class RosTensorflow():
 
 if __name__ == '__main__':
     rospy.init_node('rostensorflow')
-    rtf = RosTensorFlow()
+    rtf = RosTensorFlow(GRAPH, LABELS)
     rtf.main()
