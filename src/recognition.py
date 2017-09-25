@@ -1,4 +1,6 @@
 import os
+
+from timeit import default_timer as timer
 from object_detection.utils import label_map_util
 import numpy as np
 import tensorflow as tf
@@ -31,20 +33,17 @@ class ObjectDetector(object):
         self.category_idx = label_map_util.create_category_index(categories)
 
 
-    def detect(self, image, max_objects=3):
+    def detect(self, image):
+        image_expanded = np.expand_dims(image, axis=0)
         with self.graph.as_default():
-            image_expanded = np.expand_dims(image, axis=0)
-
             (boxes, scores, classes, num_detections) = self.sess.run(
                     [self.boxes, self.scores, self.classes, self.num_detections],
-                    feed_dict={self.image_tensor: image_expanded})
+                   feed_dict={self.image_tensor: image_expanded})
 
-        # print('Classes: {}'.format(classes))
-        # print('Scores: {}'.format(scores))
         top_score_id = np.argmax(scores[0])
         top_class_id = classes[0][top_score_id]
         category = self.category_idx[top_class_id]['name']
         score = scores[0][top_score_id]
         box = boxes[0][top_score_id]
 
-        return category, score, box
+        return box, score, category
