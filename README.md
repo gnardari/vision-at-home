@@ -10,7 +10,7 @@ ROS + Tensorflow Object Detection API
 
 [Python Tutorial](http://www.pyimagesearch.com/2016/10/24/ubuntu-16-04-how-to-install-opencv/)
 
-#### Run tf object detection script
+#### Run tf object detection script inside your virtual env
 
 ```shell
 chmod +x install-tf-api.sh

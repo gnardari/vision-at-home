@@ -1,4 +1,5 @@
-pip install tensorflow
-pip install pillow
-pip install lxml
-pip install matplotlib
+numpy
+tensorflow
+pillow
+lxml
+matplotlib
