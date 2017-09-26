@@ -6,8 +6,8 @@ pip install -r requirements.txt
 
 cd src/
 # partially download repo
-svn export https://github.com/tensorflow/models.git/trunk/object_detection
-svn export https://github.com/tensorflow/models.git/trunk/slim
+svn export https://github.com/tensorflow/models.git/trunk/research/object_detection
+svn export https://github.com/tensorflow/models.git/trunk/research/slim
 
 # build protobufs
 sudo apt-get install protobuf-compiler
