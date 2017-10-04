@@ -1,5 +1,7 @@
 import os
 
+from object_detection.utils import visualization_utils as vu
+from matplotlib import pyplot as plt
 from timeit import default_timer as timer
 from object_detection.utils import label_map_util
 import numpy as np
@@ -40,10 +42,26 @@ class ObjectDetector(object):
                     [self.boxes, self.scores, self.classes, self.num_detections],
                    feed_dict={self.image_tensor: image_expanded})
 
-        top_score_id = np.argmax(scores[0])
-        top_class_id = classes[0][top_score_id]
-        category = self.category_idx[top_class_id]['name']
-        score = scores[0][top_score_id]
-        box = boxes[0][top_score_id]
+        # scores = scores[scores > 0.95]
+        return boxes, scores, classes
+        # top_score_id = np.argmax(scores[0])
+        # top_class_id = classes[0][top_score_id]
+        # category = self.category_idx[top_class_id]['name']
+        # score = scores[0][top_score_id]
+        # box = boxes[0][top_score_id]
+        # return box, score, category
 
-        return box, score, category
+    def draw_detection(self, image, boxes, classes, scores, res_path, fsize=(12,8)):
+        fig, ax = plt.subplots(1)
+        vu.visualize_boxes_and_labels_on_image_array(
+                                image,
+                                np.squeeze(boxes),
+                                np.squeeze(classes).astype(np.int32),
+                                np.squeeze(scores),
+                                self.category_idx,
+                                use_normalized_coordinates=True,
+                                min_score_thresh=0.95,
+                                line_thickness=8)
+
+        plt.figure(figsize=fsize)
+        plt.savefig(res_path)
