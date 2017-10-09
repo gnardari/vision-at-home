@@ -38,6 +38,9 @@ class ObjectDetector(object):
         self.category_idx = label_map_util.create_category_index(categories)
 
 
+    def ids_to_labels(self, ids):
+        return [self.category_idx[i]['name'] for i in ids]
+
     def detect(self, image):
         image_expanded = np.expand_dims(image, axis=0)
         with self.graph.as_default():
@@ -62,3 +65,4 @@ class ObjectDetector(object):
         plt.figure(figsize=fsize)
         plt.imshow(image)
         plt.savefig(res_path)
+        plt.close('all')
