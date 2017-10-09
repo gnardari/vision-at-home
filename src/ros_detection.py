@@ -25,13 +25,24 @@ class RosTensorflow():
                 num_classes=nclasses)
 
     def callback(self, image_msg):
-        cv_image = self._cv_bridge.imgmsg_to_cv2(image_msg, "bgr8")
+        cv_image = self._cv_bridge.imgmsg_to_cv2(image_msg, "rgb8")
         result = self.detector.detect(cv_image)
-        box, score, category = result
+        boxes, classes, scores = result
 
-        rospy.loginfo('%s (score = %.5f)' % (category, score))
-        msg = json.dumps({'category': category, 'score': score, 'box': box})
-        self._pub.publish(category)
+        boxes = np.squeeze(boxes)
+        classes = np.squeeze(classes)
+        scores = np.squeeze(scores)
+        if scores[0] > self.score_threshold:
+            self.detector.draw_detection(boxes,
+                                         classes.astype(np.int32),
+                                         scores,
+                                         'detection.jpg',
+                                         use_normalized_coordinates=True,
+                                         line_thickness=8)
+            msg = json.dumps({'classes': classes, 'scores': scores, 'boxes': boxes})
+            self._pub.publish(msg)
+        else:
+            rospy.loginfo('Weak detections: {}'.format(zip(classes[:3], scores[:3])))
 
     def main(self):
         rospy.spin()
