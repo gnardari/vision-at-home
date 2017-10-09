@@ -9,7 +9,7 @@ import tensorflow as tf
 import rospy
 import cv2
 
-GRAPH = os.path.join('graphs', 'fronzen_inference_graph.pb')
+GRAPH = os.path.join('graphs', 'frozen_inference_graph.pb')
 LABELS = os.path.join('graphs', 'mscoco_label_map.pbtxt')
 NCLASSES = 100
 
@@ -45,9 +45,10 @@ class RosTensorflow():
             rospy.loginfo('Weak detections: {}'.format(zip(classes[:3], scores[:3])))
 
     def main(self):
+        rospy.loginfo('Starting Node...')
         rospy.spin()
 
 if __name__ == '__main__':
     rospy.init_node('rostensorflow')
-    rtf = RosTensorFlow(GRAPH, LABELS, NCLASSES)
+    rtf = RosTensorflow(GRAPH, LABELS, NCLASSES)
     rtf.main()
